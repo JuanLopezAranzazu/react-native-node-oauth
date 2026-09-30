@@ -9,6 +9,8 @@ app.use(cors());
 app.use(express.json());
 app.use(passport.initialize());
 
+app.use("/auth", require("./routes/auth"));
+app.use("/notes", require("./routes/notes"));
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
 app.use((err, _req, res, _next) => {
