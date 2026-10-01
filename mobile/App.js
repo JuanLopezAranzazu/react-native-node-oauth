@@ -1,20 +1,55 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { GluestackUIProvider, Center, Spinner } from "@gluestack-ui/themed";
+import { config } from "./src/theme/config";
+import { ThemeProvider, useTheme } from "./src/theme";
+import { AuthProvider, useAuth } from "./src/auth";
+import LoginScreen from "./src/screens/LoginScreen";
+import NotesScreen from "./src/screens/NotesScreen";
+import EditorScreen from "./src/screens/EditorScreen";
 
-export default function App() {
+function Root() {
+  const { user, loading } = useAuth();
+  const { colors } = useTheme();
+  const [editing, setEditing] = useState(undefined);
+  const [version, setVersion] = useState(0);
+
+  if (loading)
+    return (
+      <Center flex={1} bg={colors.bg}>
+        <Spinner size="large" />
+      </Center>
+    );
+  if (!user) return <LoginScreen />;
+  if (editing !== undefined)
+    return (
+      <EditorScreen
+        note={editing}
+        onClose={() => {
+          setEditing(undefined);
+          setVersion((v) => v + 1);
+        }}
+      />
+    );
+  return <NotesScreen key={version} onOpen={setEditing} />;
+}
+
+function Themed() {
+  const { mode } = useTheme();
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <GluestackUIProvider config={config} colorMode={mode}>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
+      <AuthProvider>
+        <Root />
+      </AuthProvider>
+    </GluestackUIProvider>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  return (
+    <ThemeProvider>
+      <Themed />
+    </ThemeProvider>
+  );
+}

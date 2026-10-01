@@ -29,6 +29,7 @@ export default function SocialButton({ provider, loading, disabled, onPress }) {
       variant={p.variant}
       onPress={() => onPress(provider)}
       isDisabled={disabled}
+      width="$full"
     >
       {loading ? (
         <ButtonSpinner mr="$2" />
@@ -40,7 +41,9 @@ export default function SocialButton({ provider, loading, disabled, onPress }) {
           style={{ marginRight: 8 }}
         />
       )}
-      <ButtonText>{p.label}</ButtonText>
+      <ButtonText flexShrink={1} numberOfLines={1}>
+        {p.label}
+      </ButtonText>
     </Button>
   );
 }
